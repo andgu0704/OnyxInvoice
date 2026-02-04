@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onyx Invoice Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f3f4f6;
+      }
+      
+      /* Print Styles */
+      @media print {
+        @page {
+          size: A4;
+          margin: 0;
+        }
+        
+        body {
+          background-color: white;
+        }
+
+        /* Hide UI elements */
+        .no-print {
+          display: none !important;
+        }
+
+        /* Reset layout for printing */
+        body, #root, main, .overflow-y-auto, .flex, .h-screen {
+          overflow: visible !important;
+          height: auto !important;
+          width: auto !important;
+          display: block !important;
+          position: static !important;
+        }
+
+        /* Ensure the preview container takes full width/height without scaling */
+        .print-wrapper {
+          display: block !important;
+          width: 100% !important;
+          height: auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          transform: none !important;
+          overflow: visible !important;
+        }
+
+        .print-container {
+          box-shadow: none !important;
+          margin: 0 auto !important;
+          width: 100% !important;
+          max-width: 210mm !important; /* A4 width */
+          border: none !important;
+        }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "date-fns": "https://esm.sh/date-fns@^4.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
