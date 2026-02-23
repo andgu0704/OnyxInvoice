@@ -18,12 +18,12 @@ const InvoicePreview = React.forwardRef<HTMLDivElement, InvoicePreviewProps>(({ 
     const subtotal = data.items.length * parsedPrice;
     const vat = subtotal * VAT_RATE;
     const total = subtotal + vat;
-    
+
     return { subtotal, vat, total };
   }, [data.items.length, parsedPrice]);
 
   const currencySymbol = data.currency === 'USD' ? '$' : '₾';
-  
+
   // Format number helper
   const formatMoney = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -38,35 +38,35 @@ const InvoicePreview = React.forwardRef<HTMLDivElement, InvoicePreviewProps>(({ 
          Removed shadow-lg to prevent artifacts in HTML2PDF. 
          Using ring or border for screen visibility if needed, but white paper on gray background is usually distinct enough.
       */}
-      <div 
-        ref={ref} 
+      <div
+        ref={ref}
         className="print-container bg-white text-black w-[210mm] min-h-[296mm] p-[10mm] md:p-[15mm] text-sm leading-relaxed box-border"
         style={{ fontFamily: "'Inter', sans-serif" }}
       >
         {/* Header Section - Mimicking Excel Cell H layout roughly */}
         <div className="flex justify-between mb-12">
           <div className="w-1/2">
-             <h1 className="text-3xl font-bold text-black tracking-tight">INVOICE</h1>
-             <p className="text-gray-600 mt-1 font-medium">ინვოისი</p>
+            <h1 className="text-3xl font-bold text-black tracking-tight">INVOICE</h1>
+            <p className="text-gray-600 mt-1 font-medium">ინვოისი</p>
           </div>
           <div className="w-1/2 text-right">
             <table className="ml-auto text-sm border-collapse">
               <tbody>
                 <tr>
-                  <td className="font-bold pr-4 py-1 text-black">Invoice #</td>
-                  <td className="font-bold py-1 text-black">{data.invoiceNumber}</td>
+                  <td className="font-bold pr-4 py-1 text-black text-right whitespace-nowrap">Invoice #</td>
+                  <td className="font-bold py-1 text-black text-left">{data.invoiceNumber}</td>
                 </tr>
                 <tr>
-                  <td className="font-bold pr-4 py-1 text-black">Date</td>
-                  <td className="py-1 text-black">{format(data.date, 'dd/MM/yyyy')}</td>
+                  <td className="font-bold pr-4 py-1 text-black text-right whitespace-nowrap">Date</td>
+                  <td className="py-1 text-black text-left">{format(data.date, 'dd/MM/yyyy')}</td>
                 </tr>
                 <tr>
-                  <td className="font-bold pr-4 py-1 text-black">Due Date</td>
-                  <td className="py-1 text-black">{format(dueDate, 'dd/MM/yyyy')}</td>
+                  <td className="font-bold pr-4 py-1 text-black text-right whitespace-nowrap">Due Date</td>
+                  <td className="py-1 text-black text-left">{format(dueDate, 'dd/MM/yyyy')}</td>
                 </tr>
                 <tr>
-                  <td className="font-bold pr-4 py-1 text-black">Currency</td>
-                  <td className="py-1 text-black">{data.currency}</td>
+                  <td className="font-bold pr-4 py-1 text-black text-right whitespace-nowrap">Currency</td>
+                  <td className="py-1 text-black text-left">{data.currency}</td>
                 </tr>
               </tbody>
             </table>
@@ -105,16 +105,16 @@ const InvoicePreview = React.forwardRef<HTMLDivElement, InvoicePreviewProps>(({ 
             <thead>
               <tr className="bg-gray-100">
                 <th className="border border-gray-300 px-4 py-2 text-left font-bold text-xs uppercase tracking-wider text-black">
-                  საქონელი/მომსახურება<br/>Item
+                  საქონელი/მომსახურება<br />Item
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-right font-bold text-xs uppercase tracking-wider text-black w-32">
-                  ფასი დღგ-ს გარეშე<br/>Price Excl. VAT
+                  ფასი დღგ-ს გარეშე<br />Price Excl. VAT
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-right font-bold text-xs uppercase tracking-wider text-black w-24">
-                  დღგ<br/>VAT
+                  დღგ<br />VAT
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-right font-bold text-xs uppercase tracking-wider text-black w-32">
-                  ღირებულება დღგ-ს ჩათვლით<br/>Total Value
+                  ღირებულება დღგ-ს ჩათვლით<br />Total Value
                 </th>
               </tr>
             </thead>
@@ -134,20 +134,20 @@ const InvoicePreview = React.forwardRef<HTMLDivElement, InvoicePreviewProps>(({ 
                       </td>
                       {index === 0 && (
                         <>
-                          <td 
-                            rowSpan={data.items.length} 
+                          <td
+                            rowSpan={data.items.length}
                             className="border border-gray-300 px-4 py-2 text-right font-mono text-black align-middle"
                           >
                             {formatMoney(totals.subtotal)}
                           </td>
-                          <td 
-                            rowSpan={data.items.length} 
+                          <td
+                            rowSpan={data.items.length}
                             className="border border-gray-300 px-4 py-2 text-right font-mono text-black align-middle"
                           >
                             {formatMoney(totals.vat)}
                           </td>
-                          <td 
-                            rowSpan={data.items.length} 
+                          <td
+                            rowSpan={data.items.length}
                             className="border border-gray-300 px-4 py-2 text-right font-mono text-black bg-gray-50 align-middle"
                           >
                             {formatMoney(totals.total)}
@@ -164,19 +164,19 @@ const InvoicePreview = React.forwardRef<HTMLDivElement, InvoicePreviewProps>(({ 
 
         {/* Footer Totals */}
         <div className="flex justify-end">
-          <div className="w-64">
-             <div className="flex justify-between py-2 border-b border-gray-200">
-                <span className="font-bold text-black">Subtotal:</span>
-                <span className="font-mono text-black">{currencySymbol} {formatMoney(totals.subtotal)}</span>
-             </div>
-             <div className="flex justify-between py-2 border-b border-gray-200">
-                <span className="font-bold text-black">Total VAT (18%):</span>
-                <span className="font-mono text-black">{currencySymbol} {formatMoney(totals.vat)}</span>
-             </div>
-             <div className="flex justify-between py-3 border-b-2 border-black mt-1 bg-gray-50 px-2 -mx-2">
-                <span className="font-bold text-lg text-black">Grand Total:</span>
-                <span className="font-bold text-lg font-mono text-black">{currencySymbol} {formatMoney(totals.total)}</span>
-             </div>
+          <div className="w-56">
+            <div className="flex justify-between py-2 border-b border-gray-200">
+              <span className="font-bold text-black">Subtotal:</span>
+              <span className="font-mono text-black">{currencySymbol}{formatMoney(totals.subtotal)}</span>
+            </div>
+            <div className="flex justify-between py-2 border-b border-gray-200">
+              <span className="font-bold text-black">Total VAT (18%):</span>
+              <span className="font-mono text-black">{currencySymbol}{formatMoney(totals.vat)}</span>
+            </div>
+            <div className="flex justify-between py-3 border-b-2 border-black mt-1 bg-gray-50 px-2 -mx-2">
+              <span className="font-bold text-lg text-black">Grand Total:</span>
+              <span className="font-bold text-lg font-mono text-black">{currencySymbol}{formatMoney(totals.total)}</span>
+            </div>
           </div>
         </div>
       </div>
