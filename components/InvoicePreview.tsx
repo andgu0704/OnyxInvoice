@@ -57,7 +57,7 @@ const InvoicePreview = React.forwardRef<HTMLDivElement, InvoicePreviewProps>(({ 
                   <td className="font-bold py-1 text-black text-left">{data.invoiceNumber}</td>
                 </tr>
                 <tr>
-                  <td className="font-bold pr-4 py-1 text-black text-right whitespace-nowrap">Date</td>
+                  <td className="font-bold pr-4 py-1 text-black text-right whitespace-nowrap">Invoice Date</td>
                   <td className="py-1 text-black text-left">{format(data.date, 'dd/MM/yyyy')}</td>
                 </tr>
                 <tr>

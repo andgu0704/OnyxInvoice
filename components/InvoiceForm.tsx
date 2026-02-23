@@ -80,7 +80,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ data, onChange }) => {
             value={format(dueDate, 'dd/MM/yyyy')}
             className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-500 cursor-not-allowed"
           />
-          <p className="text-xs text-gray-500 mt-1">Calculated as Date + 7 days</p>
+          <p className="text-xs text-gray-500 mt-1">Calculated as Invoice Date + 7 days</p>
         </div>
 
         <div className="md:col-span-2">
@@ -98,7 +98,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ data, onChange }) => {
         <div className="md:col-span-2 bg-blue-50 p-4 rounded-md border border-blue-100">
           <label className="block text-sm font-semibold text-blue-800 mb-1">Unit Price (Excl. VAT) - Applies to all items</label>
           <div className="relative">
-             <input
+            <input
               type="text"
               inputMode="decimal"
               value={data.priceExclVat}
@@ -150,7 +150,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ data, onChange }) => {
               </button>
             </div>
           ))}
-          
+
           {data.items.length === 0 && (
             <div className="text-center py-8 text-gray-400 bg-gray-50 rounded-lg border border-dashed border-gray-300">
               No items added yet. Click "Add Item" to start.
