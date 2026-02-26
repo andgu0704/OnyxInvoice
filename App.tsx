@@ -45,9 +45,20 @@ const App: React.FC = () => {
     }
   }, []);
 
-  const saveCompanies = (newCompanies: CompanyDetails[]) => {
+  const saveCompanies = async (newCompanies: CompanyDetails[]) => {
     setCompanies(newCompanies);
     localStorage.setItem('onyx_companies', JSON.stringify(newCompanies));
+
+    // Also sync to GitHub via our Vercel Serverless Function
+    try {
+      await fetch('/api/companies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ companies: newCompanies })
+      });
+    } catch (err) {
+      console.error('Failed to sync with API', err);
+    }
   };
 
   const handleAddCompany = async (company: Partial<CompanyDetails>) => {
