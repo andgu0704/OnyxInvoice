@@ -3,6 +3,7 @@ import { Download, Loader2 } from 'lucide-react';
 import InvoiceForm from './components/InvoiceForm';
 import InvoicePreview from './components/InvoicePreview';
 import { Currency, InvoiceState, CompanyDetails } from './types';
+import companiesData from './data/companies.json';
 
 const App: React.FC = () => {
   const [companies, setCompanies] = useState<CompanyDetails[]>([]);
@@ -21,48 +22,45 @@ const App: React.FC = () => {
   const componentRef = useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    fetch('/api/companies')
-      .then(res => res.json())
-      .then(data => {
-        setCompanies(data);
-        if (data.length > 0) {
-          setInvoiceData(prev => ({ ...prev, selectedCompany: data[0].id }));
+    const stored = localStorage.getItem('onyx_companies');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        setCompanies(parsed);
+        if (parsed.length > 0 && !invoiceData.selectedCompany) {
+          setInvoiceData(prev => ({ ...prev, selectedCompany: parsed[0].id }));
         }
-      })
-      .catch(err => console.error("Failed to load companies", err));
+      } catch (e) {
+        console.error("Failed to parse stored companies", e);
+        setCompanies(companiesData);
+        if (companiesData.length > 0 && !invoiceData.selectedCompany) {
+          setInvoiceData(prev => ({ ...prev, selectedCompany: companiesData[0].id }));
+        }
+      }
+    } else {
+      setCompanies(companiesData);
+      if (companiesData.length > 0 && !invoiceData.selectedCompany) {
+        setInvoiceData(prev => ({ ...prev, selectedCompany: companiesData[0].id }));
+      }
+    }
   }, []);
 
+  const saveCompanies = (newCompanies: CompanyDetails[]) => {
+    setCompanies(newCompanies);
+    localStorage.setItem('onyx_companies', JSON.stringify(newCompanies));
+  };
+
   const handleAddCompany = async (company: Partial<CompanyDetails>) => {
-    try {
-      const res = await fetch('/api/companies', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(company)
-      });
-      if (res.ok) {
-        const newCompany = await res.json();
-        setCompanies(prev => [...prev, newCompany]);
-        return newCompany;
-      }
-    } catch (err) {
-      console.error(err);
-    }
+    const newCompany = { ...company, id: 'comp_' + Date.now() } as CompanyDetails;
+    saveCompanies([...companies, newCompany]);
+    return newCompany;
   };
 
   const handleDeleteCompany = async (id: string) => {
-    try {
-      const res = await fetch(`/api/companies/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        setCompanies(prev => {
-          const filtered = prev.filter(c => c.id !== id);
-          if (invoiceData.selectedCompany === id) {
-            setInvoiceData(inv => ({ ...inv, selectedCompany: filtered.length > 0 ? filtered[0].id! : '' }));
-          }
-          return filtered;
-        });
-      }
-    } catch (err) {
-      console.error(err);
+    const filtered = companies.filter(c => c.id !== id);
+    saveCompanies(filtered);
+    if (invoiceData.selectedCompany === id) {
+      setInvoiceData(inv => ({ ...inv, selectedCompany: filtered.length > 0 ? filtered[0].id! : '' }));
     }
   };
 
