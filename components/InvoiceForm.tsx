@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { format, addDays } from 'date-fns';
 import { Plus, Trash2 } from 'lucide-react';
-import { CompanyKey, Currency, InvoiceItem, InvoiceState } from '../types';
+import { Currency, InvoiceItem, InvoiceState, CompanyDetails } from '../types';
 
 interface InvoiceFormProps {
   data: InvoiceState;
   onChange: (data: InvoiceState) => void;
+  companies: CompanyDetails[];
+  onAddCompany: (company: Partial<CompanyDetails>) => void;
+  onDeleteCompany: (id: string) => void;
 }
 
-const InvoiceForm: React.FC<InvoiceFormProps> = ({ data, onChange }) => {
+const InvoiceForm: React.FC<InvoiceFormProps> = ({ data, onChange, companies, onAddCompany, onDeleteCompany }) => {
+  const [showAddCompany, setShowAddCompany] = useState(false);
+  const [newCompany, setNewCompany] = useState({ name: '', idCode: '', address: '' });
   const handleItemChange = (id: string, field: keyof InvoiceItem, value: string) => {
     const newItems = data.items.map(item => {
       if (item.id === id) {
@@ -84,15 +89,87 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ data, onChange }) => {
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Buyer Company</label>
-          <select
-            value={data.selectedCompany}
-            onChange={(e) => onChange({ ...data, selectedCompany: e.target.value as CompanyKey })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value={CompanyKey.TOYOTA}>Toyota Caucasus</option>
-            <option value={CompanyKey.CIC}>CIC Insurance</option>
-          </select>
+          <div className="flex justify-between items-end mb-1">
+            <label className="block text-sm font-medium text-gray-700">Buyer Company</label>
+            <button
+              onClick={() => setShowAddCompany(!showAddCompany)}
+              className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+            >
+              <Plus size={14} /> Add New Company
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <select
+              value={data.selectedCompany}
+              onChange={(e) => onChange({ ...data, selectedCompany: e.target.value })}
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="" disabled>Select a company</option>
+              {companies.map(company => (
+                <option key={company.id} value={company.id}>
+                  {company.name}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => {
+                if (window.confirm('Delete selected company?')) {
+                  onDeleteCompany(data.selectedCompany);
+                }
+              }}
+              disabled={!data.selectedCompany || companies.length <= 1}
+              className="px-3 py-2 text-red-600 border border-red-200 hover:bg-red-50 rounded-md disabled:opacity-50"
+              title="Delete Company"
+            >
+              <Trash2 size={18} />
+            </button>
+          </div>
+
+          {showAddCompany && (
+            <div className="mt-3 p-4 bg-white border border-gray-200 rounded-md shadow-sm">
+              <h4 className="text-sm font-semibold mb-3">Add New Company</h4>
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Company Name"
+                  value={newCompany.name}
+                  onChange={e => setNewCompany(c => ({ ...c, name: e.target.value }))}
+                  className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm"
+                />
+                <input
+                  type="text"
+                  placeholder="ID Code"
+                  value={newCompany.idCode}
+                  onChange={e => setNewCompany(c => ({ ...c, idCode: e.target.value }))}
+                  className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm"
+                />
+                <input
+                  type="text"
+                  placeholder="Address"
+                  value={newCompany.address}
+                  onChange={e => setNewCompany(c => ({ ...c, address: e.target.value }))}
+                  className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm"
+                />
+                <div className="flex justify-end gap-2 pt-1">
+                  <button
+                    onClick={() => setShowAddCompany(false)}
+                    className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
+                  >Cancel</button>
+                  <button
+                    onClick={() => {
+                      if (newCompany.name && newCompany.idCode) {
+                        onAddCompany(newCompany);
+                        setNewCompany({ name: '', idCode: '', address: '' });
+                        setShowAddCompany(false);
+                      }
+                    }}
+                    disabled={!newCompany.name || !newCompany.idCode}
+                    className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  >Save Company</button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="md:col-span-2 bg-blue-50 p-4 rounded-md border border-blue-100">

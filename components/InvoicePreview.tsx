@@ -1,14 +1,15 @@
 import React, { useMemo } from 'react';
 import { format, addDays } from 'date-fns';
 import { InvoiceState } from '../types';
-import { SUPPLIER_INFO, BUYER_OPTIONS, VAT_RATE } from '../constants';
+import { SUPPLIER_INFO, VAT_RATE } from '../constants';
 
 interface InvoicePreviewProps {
   data: InvoiceState;
+  companies: import('../types').CompanyDetails[];
 }
 
-const InvoicePreview = React.forwardRef<HTMLDivElement, InvoicePreviewProps>(({ data }, ref) => {
-  const buyer = BUYER_OPTIONS[data.selectedCompany];
+const InvoicePreview = React.forwardRef<HTMLDivElement, InvoicePreviewProps>(({ data, companies }, ref) => {
+  const buyer = companies.find((c: any) => c.id === data.selectedCompany) || companies[0] || { name: '', idCode: '', address: '' };
   const dueDate = addDays(data.date, 7);
 
   const parsedPrice = parseFloat(data.priceExclVat) || 0;

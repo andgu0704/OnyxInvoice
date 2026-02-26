@@ -3,10 +3,6 @@ export enum Currency {
   GEL = 'GEL'
 }
 
-export enum CompanyKey {
-  TOYOTA = 'Toyota',
-  CIC = 'CIC'
-}
 
 export interface InvoiceItem {
   id: string;
@@ -14,6 +10,7 @@ export interface InvoiceItem {
 }
 
 export interface CompanyDetails {
+  id?: string;
   name: string;
   idCode: string;
   address: string;
@@ -29,7 +26,7 @@ export interface InvoiceState {
   invoiceNumber: string;
   date: Date;
   currency: Currency;
-  selectedCompany: CompanyKey;
+  selectedCompany: string;
   priceExclVat: string;
   items: InvoiceItem[];
 }

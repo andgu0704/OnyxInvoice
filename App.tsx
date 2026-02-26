@@ -2,15 +2,15 @@ import React, { useState, useRef } from 'react';
 import { Download, Loader2 } from 'lucide-react';
 import InvoiceForm from './components/InvoiceForm';
 import InvoicePreview from './components/InvoicePreview';
-import { CompanyKey, Currency, InvoiceState } from './types';
+import { Currency, InvoiceState, CompanyDetails } from './types';
 
 const App: React.FC = () => {
-  // Initial State
+  const [companies, setCompanies] = useState<CompanyDetails[]>([]);
   const [invoiceData, setInvoiceData] = useState<InvoiceState>({
     invoiceNumber: '',
     date: new Date(),
     currency: Currency.USD,
-    selectedCompany: CompanyKey.TOYOTA,
+    selectedCompany: '',
     priceExclVat: '0',
     items: [
       { id: '1', description: '' }
@@ -20,9 +20,55 @@ const App: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const componentRef = useRef<HTMLDivElement>(null);
 
+  React.useEffect(() => {
+    fetch('/api/companies')
+      .then(res => res.json())
+      .then(data => {
+        setCompanies(data);
+        if (data.length > 0) {
+          setInvoiceData(prev => ({ ...prev, selectedCompany: data[0].id }));
+        }
+      })
+      .catch(err => console.error("Failed to load companies", err));
+  }, []);
+
+  const handleAddCompany = async (company: Partial<CompanyDetails>) => {
+    try {
+      const res = await fetch('/api/companies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(company)
+      });
+      if (res.ok) {
+        const newCompany = await res.json();
+        setCompanies(prev => [...prev, newCompany]);
+        return newCompany;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteCompany = async (id: string) => {
+    try {
+      const res = await fetch(`/api/companies/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setCompanies(prev => {
+          const filtered = prev.filter(c => c.id !== id);
+          if (invoiceData.selectedCompany === id) {
+            setInvoiceData(inv => ({ ...inv, selectedCompany: filtered.length > 0 ? filtered[0].id! : '' }));
+          }
+          return filtered;
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleDownloadPdf = async () => {
     if (!componentRef.current) return;
-    
+
     setIsGenerating(true);
 
     try {
@@ -55,7 +101,7 @@ const App: React.FC = () => {
           </div>
           <h1 className="text-lg font-semibold tracking-wide">Onyx Invoice Generator</h1>
         </div>
-        
+
         <button
           onClick={handleDownloadPdf}
           disabled={isGenerating}
@@ -70,24 +116,27 @@ const App: React.FC = () => {
       <main className="flex flex-1 overflow-hidden">
         {/* Left Side: Data Entry */}
         <div className="no-print w-full lg:w-5/12 xl:w-4/12 bg-gray-50 border-r border-gray-200 p-4 overflow-y-auto custom-scrollbar">
-          <InvoiceForm 
-            data={invoiceData} 
-            onChange={setInvoiceData} 
+          <InvoiceForm
+            data={invoiceData}
+            onChange={setInvoiceData}
+            companies={companies}
+            onAddCompany={handleAddCompany}
+            onDeleteCompany={handleDeleteCompany}
           />
         </div>
 
         {/* Right Side: Preview */}
         <div className="print-wrapper w-full lg:w-7/12 xl:w-8/12 bg-gray-200 overflow-y-auto p-8 flex items-start justify-center">
-            {/* The wrapper div ensures the preview has space around it in the view area */}
-            <div className="print-wrapper transform scale-[0.85] xl:scale-100 origin-top transition-transform duration-200">
-               <InvoicePreview ref={componentRef} data={invoiceData} />
-            </div>
+          {/* The wrapper div ensures the preview has space around it in the view area */}
+          <div className="print-wrapper transform scale-[0.85] xl:scale-100 origin-top transition-transform duration-200">
+            <InvoicePreview ref={componentRef} data={invoiceData} companies={companies} />
+          </div>
         </div>
-        
+
         {/* Mobile Preview Warning/Toggle could go here, for now simpler grid */}
         <div className="no-print lg:hidden w-full bg-gray-200 p-4 block">
-             <div className="text-center mb-4 text-gray-600 text-sm">Scroll down for preview</div>
-             <InvoicePreview ref={null} data={invoiceData} />
+          <div className="text-center mb-4 text-gray-600 text-sm">Scroll down for preview</div>
+          <InvoicePreview ref={null} data={invoiceData} companies={companies} />
         </div>
       </main>
     </div>
